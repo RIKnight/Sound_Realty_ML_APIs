@@ -106,7 +106,12 @@ http://localhost/shadow/green/healthz
 http://localhost/shadow/green/version
 ```
 
-4. (Optional) Scale GREEN:
+4. Promote GREEN to live (zero downtime):
+```
+make promote-green BLUE_TAG=0.1.0 GREEN_TAG=0.2.0
+```
+
+5. (Optional) Scale GREEN:
 ```
 make scale-green N=4
 ```
@@ -116,8 +121,8 @@ Rollback is symmetric: `make promote-blue`.
 ### Notes
 
 * Traefik watches Docker events—router updates are applied instantly.
-* Health checks use /readyz for load balancer health and /healthz for liveness.
-* You can keep both blue and green running after promotion for fast rollback, or docker compose rm the old one.
+* Health checks use `/readyz` for load balancer health and `/healthz` for liveness.
+* You can keep both blue and green running after promotion for fast rollback, or `docker compose rm` the old one.
 * For canary percentages, we can add a Traefik weighted service config on request.
 
 ### How to Use
