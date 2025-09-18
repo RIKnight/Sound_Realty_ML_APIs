@@ -31,7 +31,7 @@ curl http://localhost/version
 # Shadow endpoints for validation
 curl http://localhost/shadow/green/healthz
 curl http://localhost/shadow/green/version
-
+```
 
 ## Transparency regarding AI Usage:
 
