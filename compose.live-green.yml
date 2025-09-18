@@ -1,0 +1,14 @@
+services:
+  api_green:
+    labels:
+      # Live route → green
+      - "traefik.http.routers.api.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.routers.api.service=green"
+
+  # Ensure no conflicting live router on blue:
+  api_blue:
+    labels:
+      # No 'api' router here; blue only serves /shadow/blue
+      - "traefik.enable=true"
+
