@@ -3,7 +3,8 @@ version: "3.9"
 x-common-env: &common-env
   APP_NAME: flask-api
   LOG_LEVEL: INFO
-  # Versions (can also be set in .env)
+  # Versions (can be overridden by Makefile; overrides .env file)
+  IMAGE: ${IMAGE:-dataknight/flask-api}
   BLUE_TAG: ${BLUE_TAG:-0.1.0}
   GREEN_TAG: ${GREEN_TAG:-0.2.0}
 
@@ -24,7 +25,7 @@ services:
     restart: unless-stopped
 
   api_blue:
-    image: yourorg/flask-api:${BLUE_TAG}
+    image: ${IMAGE}:${BLUE_TAG}
     environment:
       <<: *common-env
       APP_VERSION: ${BLUE_TAG}
@@ -47,7 +48,7 @@ services:
     restart: unless-stopped
 
   api_green:
-    image: yourorg/flask-api:${GREEN_TAG}
+    image: ${IMAGE}:${GREEN_TAG}
     environment:
       <<: *common-env
       APP_VERSION: ${GREEN_TAG}

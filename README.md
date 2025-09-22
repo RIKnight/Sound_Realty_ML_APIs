@@ -16,6 +16,7 @@ A lightweight Flask API served by Gunicorn, containerized with Docker, fronted b
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 pytest -q --cov=app
+
 # 2) Build images
 make build-blue BLUE_TAG=0.1.0
 make build-green GREEN_TAG=0.2.0
@@ -128,8 +129,7 @@ Rollback is symmetric: `make promote-blue`.
 ### How to Use
 
 1. Install and test locally
-```
-bash
+```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 pytest -q --cov=app
