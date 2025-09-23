@@ -8,8 +8,10 @@ COMPOSE=docker compose
 .PHONY: help
 help:
 	@echo "Targets:"
-	@echo "  venv             Create venv and install deps"
-	@echo "  test             Run unit tests"
+	@echo "  venv             Create Flask venv and install deps"
+	@echo "  train-venv       Create scikit-learn venv and install deps"
+	@echo "  test             Run unit tests in Flask venv"
+	@echo "  train-model      Train a new model in training venv"
 	@echo "  build-blue       Build blue image"
 	@echo "  build-green      Build green image"
 	@echo "  up-blue          Start Traefik + blue live"
@@ -23,8 +25,14 @@ help:
 venv:
 	python -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
 
-test:
-	pytest -q --cov=app
+train-venv:
+	python -m venv .train_venv && . .train_venv/bin/activate && pip install -r training_requirements.txt
+
+test: venv
+	source .venv/bin/activate && pytest -q --cov=app && deactivate
+
+train-model: train-venv
+	source .train_venv/bin/activate && python mle-project-challenge-2/create_model.py && deactivate
 
 build-blue:
 	docker build -t $(IMAGE):$(BLUE_TAG) --build-arg APP_VERSION=$(BLUE_TAG) .
@@ -44,11 +52,11 @@ promote-green: up-green
 
 scale-blue:
 	@if [ -z "$$N" ]; then echo "Usage: make scale-blue N=3"; exit 1; fi
-	$(COMPOSE) -f docker-compose.yml -f compose.live-blue.yml up -d --scale api_blue=$$N
+	IMAGE=$(IMAGE) BLUE_TAG=$(BLUE_TAG) GREEN_TAG=$(GREEN_TAG) $(COMPOSE) -f docker-compose.yml -f compose.live-blue.yml up -d --scale api_blue=$$N
 
 scale-green:
 	@if [ -z "$$N" ]; then echo "Usage: make scale-green N=3"; exit 1; fi
-	$(COMPOSE) -f docker-compose.yml -f compose.live-green.yml up -d --scale api_green=$$N
+	IMAGE=$(IMAGE) BLUE_TAG=$(BLUE_TAG) GREEN_TAG=$(GREEN_TAG) $(COMPOSE) -f docker-compose.yml -f compose.live-green.yml up -d --scale api_green=$$N
 
 down:
 	$(COMPOSE) down

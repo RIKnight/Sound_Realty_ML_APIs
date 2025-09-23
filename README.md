@@ -34,6 +34,26 @@ curl http://localhost/shadow/green/healthz
 curl http://localhost/shadow/green/version
 ```
 
+## Training a new model
+
+Training is done in a separate environment than that used by the API server.
+
+First, create and start the environment with:
+```
+make train-venv
+source .train_venv/bin/activate
+```
+Then, run the script which creates the model:
+```
+python mle-project-challenge-2/create_model.py
+```
+Deactivate with:
+```
+deactivate
+```
+See [Sound Realty README](mle-project-challenge-2/README.md) for model creation details.
+
+
 ## Transparency regarding AI Usage:
 
 The initial version of code for this project was generated using Microsoft Copilot / GPT-5.
