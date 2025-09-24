@@ -8,11 +8,11 @@ COMPOSE=docker compose
 .PHONY: help venv train-venv tests load-model clean
 help:
 	@echo "Targets:"
-	@echo "  venv             Create Flask venv and install deps"
 	@echo "  train-venv       Create scikit-learn venv and install deps"
-	@echo "  tests            Run unit tests in Flask venv"
 	@echo "  train-model      Train a new model in training venv"
 	@echo "  load-model       Load model into app for serving"
+	@echo "  venv             Create Flask venv and install deps"
+	@echo "  tests            Run unit tests in Flask venv"
 	@echo "  build-blue       Build blue image"
 	@echo "  build-green      Build green image"
 	@echo "  up-blue          Start Traefik + blue live"

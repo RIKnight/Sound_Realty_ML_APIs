@@ -13,9 +13,11 @@ services:
     image: traefik:v3.1
     container_name: traefik
     command:
-      - "--api.dashboard=true"
+      - "--api.dashboard=true"  # Enable the dashboard
+      - "--api.insecure=true"  # Allow insecure access to dashboard (development only)
       - "--entrypoints.web.address=:80"
-      - "--providers.docker=true"
+      #- "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"  # Enable Docker provider
       - "--providers.docker.exposedbydefault=false"
     ports:
       - "80:80"
