@@ -1,10 +1,13 @@
 import json
 import pathlib
+import os
 import pandas as pd
 
-DATA_DIR = "../mle-project-challenge-2/data"
+BASE_DIR = os.getcwd()
+DATA_DIR = "mle-project-challenge-2/data"
 
-data_dir = pathlib.Path(DATA_DIR)
+data_dir = os.path.join(BASE_DIR, DATA_DIR)
+data_dir = pathlib.Path(data_dir)
 #training_data_filename = "kc_house_data.csv"
 unseen_data_filename = "future_unseen_examples.csv"
 
