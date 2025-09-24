@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+.train_venv/
+
+# Coverage / pytest
+.coverage
+htmlcov/
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# MacOS
+**/.DS_Store

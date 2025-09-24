@@ -1,0 +1,74 @@
+version: "3.9"
+
+x-common-env: &common-env
+  APP_NAME: flask-api
+  LOG_LEVEL: INFO
+  # Versions (can be overridden by Makefile; overrides .env file)
+  IMAGE: ${IMAGE:-dataknight/flask-api}
+  BLUE_TAG: ${BLUE_TAG:-0.1.0}
+  GREEN_TAG: ${GREEN_TAG:-0.2.0}
+
+services:
+  reverse-proxy:
+    image: traefik:v3.1
+    container_name: traefik
+    command:
+      - "--api.dashboard=true"  # Enable the dashboard
+      - "--api.insecure=true"  # Allow insecure access to dashboard (development only)
+      - "--entrypoints.web.address=:80"
+      #- "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"  # Enable Docker provider
+      - "--providers.docker.exposedbydefault=false"
+    ports:
+      - "80:80"
+      - "8080:8080" # dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+
+  api_blue:
+    image: ${IMAGE}:${BLUE_TAG}
+    environment:
+      <<: *common-env
+      APP_VERSION: ${BLUE_TAG}
+    labels:
+      - "traefik.enable=true"
+      # Shadow route to verify blue when green is live
+      - "traefik.http.routers.blue-shadow.rule=PathPrefix(`/shadow/blue`)"
+      - "traefik.http.routers.blue-shadow.entrypoints=web"
+      - "traefik.http.services.blue.loadbalancer.server.port=8000"
+      - "traefik.http.services.blue.loadbalancer.healthcheck.path=/readyz"
+      - "traefik.http.services.blue.loadbalancer.healthcheck.interval=5s"
+      # Optionally strip /shadow/blue prefix:
+      # - "traefik.http.routers.blue-shadow.middlewares=strip-blue@docker"
+      # - "traefik.http.middlewares.strip-blue.stripPrefix.prefixes=/shadow/blue"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/healthz || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  api_green:
+    image: ${IMAGE}:${GREEN_TAG}
+    environment:
+      <<: *common-env
+      APP_VERSION: ${GREEN_TAG}
+    labels:
+      - "traefik.enable=true"
+      # Shadow route to verify green when blue is live
+      - "traefik.http.routers.green-shadow.rule=PathPrefix(`/shadow/green`)"
+      - "traefik.http.routers.green-shadow.entrypoints=web"
+      - "traefik.http.services.green.loadbalancer.server.port=8000"
+      - "traefik.http.services.green.loadbalancer.healthcheck.path=/readyz"
+      - "traefik.http.services.green.loadbalancer.healthcheck.interval=5s"
+      # Optionally strip /shadow/green prefix:
+      # - "traefik.http.routers.green-shadow.middlewares=strip-green@docker"
+      # - "traefik.http.middlewares.strip-green.stripPrefix.prefixes=/shadow/green"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/healthz || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
