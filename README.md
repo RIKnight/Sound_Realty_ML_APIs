@@ -1,13 +1,22 @@
 # Sound Realty ML APIs
 API serving Proof-of-Concept for Sound Realty
 
-# Flask API (Docker Compose + Traefik, Blue/Green & Scaling)
+## Purpose
+
+Sound Realty, of the Seattle area, has developed a basic machine learning (ML) model to estimate the value of propeties.  The folks at Sound are impressed with the proof of concept and would now like to use this model to streamline their business.
+
+Our job is to create a REST endpoint that serves up model predictions for new data, and to provide guidance on how they could improve the model.
+
+
+
+## Flask API (Docker Compose + Traefik, Blue/Green & Scaling)
 
 A lightweight Flask API served by Gunicorn, containerized with Docker, fronted by Traefik for:
 - Horizontal scaling (multiple replicas)
 - Zero-downtime blue/green deployments
 - Health and readiness endpoints
 - Unit tests (pytest)
+
 
 ## Quickstart
 

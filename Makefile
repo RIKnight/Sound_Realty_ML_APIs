@@ -5,13 +5,14 @@ GREEN_TAG?=0.2.0
 
 COMPOSE=docker compose
 
-.PHONY: help
+.PHONY: help venv train-venv tests load-model clean
 help:
 	@echo "Targets:"
 	@echo "  venv             Create Flask venv and install deps"
 	@echo "  train-venv       Create scikit-learn venv and install deps"
-	@echo "  test             Run unit tests in Flask venv"
+	@echo "  tests            Run unit tests in Flask venv"
 	@echo "  train-model      Train a new model in training venv"
+	@echo "  load-model       Load model into app for serving"
 	@echo "  build-blue       Build blue image"
 	@echo "  build-green      Build green image"
 	@echo "  up-blue          Start Traefik + blue live"
@@ -21,6 +22,7 @@ help:
 	@echo "  scale-blue N=?   Scale blue to N replicas (when blue is live)"
 	@echo "  scale-green N=?  Scale green to N replicas (when green is live)"
 	@echo "  down             Stop all services (keeps images)"
+	@echo "  clean            Remove built directories"
 
 venv:
 	python -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
@@ -28,11 +30,17 @@ venv:
 train-venv:
 	python -m venv .train_venv && . .train_venv/bin/activate && pip install -r training_requirements.txt
 
-test: venv
-	source .venv/bin/activate && pytest -q --cov=app && deactivate
+tests: venv
+	source .venv/bin/activate && pytest -q --cov=app
 
 train-model: train-venv
-	source .train_venv/bin/activate && python mle-project-challenge-2/create_model.py && deactivate
+	source .train_venv/bin/activate && cd mle-project-challenge-2 && python create_model.py
+
+load-model:
+	mkdir -p app/model
+	cp mle-project-challenge-2/model/model.pkl app/model/model.pkl
+	cp mle-project-challenge-2/model/model_features.json app/model/model_features.json
+	cp mle-project-challenge-2/data/zipcode_demographics.csv app/model/zipcode_demographics.csv
 
 build-blue:
 	docker build -t $(IMAGE):$(BLUE_TAG) --build-arg APP_VERSION=$(BLUE_TAG) .
@@ -61,3 +69,5 @@ scale-green:
 down:
 	$(COMPOSE) down
 
+clean:
+	rm -rf .venv .train_venv app/model mle-project-challenge-2/model
