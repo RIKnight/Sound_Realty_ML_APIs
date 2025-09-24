@@ -27,7 +27,7 @@ if __name__ == "__main__":
     while True:
         # get a number
         row_num = input("Enter a row number for testing: ")  # input will probably be 1-based
-        test_json, result = test_predict_api(int(row_num-1))  # switch to 0-based indexing
+        test_json, result = test_predict_api(int(row_num)-1)  # switch to 0-based indexing
 
         print(f"test json from row {row_num} of the file: {test_json}")
         print(f"return status code: {result.status_code}")
